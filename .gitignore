@@ -38,3 +38,6 @@ dist/
 build/
 *.min.js
 *.min.css
+
+# 本地文档和教程（不需要推送到仓库）
+GitHub上传与部署教程.md
