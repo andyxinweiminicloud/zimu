@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图片字幕生成器</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="title">图片字幕生成器</h1>
+
+        <!-- 主界面布局 -->
+        <div class="main-interface">
+            <!-- 预览区域 -->
+            <div class="preview-section">
+                <div class="preview-container">
+                    <input type="file" id="imageInput" accept="image/*" style="display: none;">
+                    <canvas id="previewCanvas"></canvas>
+                    <div class="preview-placeholder" id="previewPlaceholder">
+                        <div class="upload-area" id="uploadArea">
+                            <div class="upload-icon">+</div>
+                            <p>点击上传图片</p>
+                        </div>
+                    </div>
+                    <button class="download-btn" id="saveBtn" disabled title="下载图片">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                    </button>
+                    <button class="replace-image-btn" id="replaceImageBtn" style="display: none;" title="替换图片">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                        <span>替换图片</span>
+                    </button>
+                    <div class="file-name" id="fileName"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 控制工具栏（字体大小和颜色） -->
+        <div class="control-toolbar" id="controlToolbar" style="display: none;">
+            <!-- 字体大小控制 -->
+            <div class="toolbar-item font-size-item">
+                <svg class="toolbar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 7V4h16v3M9 20h6M12 4v16"></path>
+                </svg>
+                <input type="range" id="fontSize" min="24" max="60" value="40" class="toolbar-slider">
+                <span class="size-value" id="fontSizeDisplay">40px</span>
+            </div>
+
+            <!-- 颜色选择控制 -->
+            <div class="toolbar-item color-item">
+                <div class="color-picker-trigger" id="colorPickerTrigger" title="点击选择颜色">
+                    <svg class="toolbar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10c.55 0 1-.45 1-1 0-.28-.11-.53-.29-.71-.18-.19-.29-.44-.29-.71 0-.55.45-1 1-1h1.17c3.03 0 5.5-2.47 5.5-5.5C20.09 6.82 16.64 2 12 2z"></path>
+                        <circle cx="6.5" cy="11.5" r="1.5"></circle>
+                        <circle cx="9.5" cy="7.5" r="1.5"></circle>
+                        <circle cx="14.5" cy="7.5" r="1.5"></circle>
+                        <circle cx="17.5" cy="11.5" r="1.5"></circle>
+                    </svg>
+                    <div class="color-preview-small" id="colorPreview"></div>
+                </div>
+
+                <!-- 颜色预设面板 -->
+                <div class="color-preset-panel" id="colorPresetPanel" style="display: none;">
+                    <div class="preset-colors">
+                        <div class="preset-color" data-color="#FFFFFF" style="background-color: #FFFFFF;" title="白色"></div>
+                        <div class="preset-color" data-color="#000000" style="background-color: #000000;" title="黑色"></div>
+                        <div class="preset-color" data-color="#FF0000" style="background-color: #FF0000;" title="红色"></div>
+                        <div class="preset-color" data-color="#FFA500" style="background-color: #FFA500;" title="橙色"></div>
+                        <div class="preset-color" data-color="#FFFF00" style="background-color: #FFFF00;" title="黄色"></div>
+                        <div class="preset-color" data-color="#00FF00" style="background-color: #00FF00;" title="绿色"></div>
+                        <div class="preset-color" data-color="#00FFFF" style="background-color: #00FFFF;" title="青色"></div>
+                        <div class="preset-color" data-color="#0000FF" style="background-color: #0000FF;" title="蓝色"></div>
+                        <div class="preset-color" data-color="#FF00FF" style="background-color: #FF00FF;" title="紫色"></div>
+                    </div>
+                    <div class="custom-color-btn" id="customColorBtn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <path d="M12 8v8M8 12h8"></path>
+                        </svg>
+                        自定义颜色
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部操作区 -->
+        <div class="bottom-section">
+            <div class="subtitle-input-wrapper">
+                <label class="input-label" for="subtitleContent">字幕内容</label>
+                <textarea id="subtitleContent" rows="3"
+                    placeholder="请输入字幕内容（每行文字会显示为一行字幕）"></textarea>
+            </div>
+        </div>
+
+        <!-- 成功提示 -->
+        <div class="notification" id="notification">
+            <span>字幕图片生成成功！</span>
+        </div>
+    </div>
+
+    <!-- 模块化架构脚本 -->
+    <script src="modules.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
+
